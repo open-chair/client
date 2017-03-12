@@ -4,8 +4,8 @@
   "description": "This is a React Template",
   "main": "./server/server.js",
   "scripts": {
-    "start": "node server/server.js",
-    "start-watch": "node server/server.js & node_modules/webpack/bin/webpack.js --config webpack.config.js --progress --colors --watch"
+    "start": "nodemon server/server.js",
+    "start-watch": "npm start & node_modules/webpack/bin/webpack.js --config webpack.config.js --progress --colors --watch"
   },
   "author": "",
   "license": "ISC",
@@ -27,6 +27,7 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "morgan": "^1.7.0",
+    "nodemon": "^1.11.0",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
     "webpack": "^1.14.0"

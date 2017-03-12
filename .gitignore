@@ -1,5 +1,17 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+node_modules
+bundle.js
+=======
+=======
+>>>>>>> 1716b6e635aeb9ed40a6d5c2853cf28968b08249
 node_modules/
 .serverless/
 *.DS_Store
 *.zip
+<<<<<<< HEAD
 config/
+>>>>>>> profile componenets and styling setup
+=======
+config/
+>>>>>>> 1716b6e635aeb9ed40a6d5c2853cf28968b08249

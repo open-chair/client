@@ -1,0 +1,157 @@
+
+$black: #000;
+$white: #fff;
+$lightGrey: #f6f6f6;
+// Global
+body{
+  background: #F7F7F7;
+  margin: 0;
+  font-family: source-sans-pro,Helvetica Neue,Helvetica,Arial,sans-serif;
+}
+li {
+    list-style-type: none;
+    font-style: italic;
+}
+// profile
+.options-wrapper {
+    position: relative;
+    background: #fff;
+    text-align: center;
+    
+}
+
+.background{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin-left: 20px;
+  margin-top: 10px;
+}
+
+.pic{
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+}
+.profile{
+  background: grey;
+  // background: url("../images/bg.jpeg");
+  position: relative;
+}
+.info{
+  color: $white;
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 2%;
+
+}
+
+.name{
+  font-size: 34px;
+}
+.points{
+  font-size: 14px;
+}
+.location-wrapper{
+  input{
+    -webkit-border-radius: 50px;
+    -moz-border-radius: 50px;
+    border-radius: 50px;
+    background: url("../images/glass.png") no-repeat;
+    background-size: contain;
+    padding-left: 20px;
+    border: 1px solid $lightGrey;
+  }
+}
+
+.options{
+  display: inline-block;
+  width: 40%;
+  border: 1px solid $lightGrey;
+  box-sizing: border-box;
+  background: linear-gradient(to bottom, $lightGrey 0%, transparent 100%),
+  linear-gradient(to top, $white 0%, transparent 100%);
+  padding: 10px;
+}
+
+// restaurant list view
+.RestaurantAvatar{
+  float: left;
+  padding-right: 5px;
+}
+
+.RestaurantInfo {
+  float: left;
+}
+
+.ResultOption {
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.RestaurantTags{
+  li{
+    display: inline-block;
+    border-radius: 100%;
+    border: 1px solid;
+    font-size: 13px;
+    padding: 3px;
+    margin-right: 5px;
+  }
+
+}
+@media all and (max-width: 960px) {
+  // header
+  #header{
+    padding: 10px 0;
+    img{
+      width: 40%;
+    }
+  }
+  // profile
+  .profile{
+    padding: 50px 0;
+  }
+  .location-wrapper {
+  }
+  .options-wrapper{
+    top: 100px;
+  }
+  .info{
+    margin-top: 0;
+    display: block;
+  }
+  // restaurant result page
+  .ResultOption{
+    overflow: hidden;
+  }
+
+  .RestaurantAvatar{
+  float: left;
+  padding-right: 5px;
+    img{
+      display: inline-block;
+      width: 150px;
+    }
+  }
+  .RestaurantInfo {
+    display: inline-block;
+    width: 50%;
+  }
+  .restaurant{
+    padding-bottom: 5px;
+    font-size: 14px;
+    &.RestaurantName{
+      font-size: 16px;
+    }
+  }
+
+}
+@media all and (max-width: 480px) {
+  .location-wrapper {
+    position: relative;
+    bottom: 20px;
+  }
+}
