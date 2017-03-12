@@ -47,6 +47,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
+// dummy data
 app.post('/restaurants', (req, res) => {
   const response = {
     "restaurants": [
@@ -73,8 +74,10 @@ app.post('/restaurants', (req, res) => {
   res.status(200).send(response);
 });
 
+
+
 // Nutritionix API Call
-app.post('/nutri', (req, res) => {
+function nutritionix(query, cb) {
   let config = {
     headers: {
       'Content-Type': 'application/json',
@@ -82,38 +85,83 @@ app.post('/nutri', (req, res) => {
       'x-app-key': API.api_key
     }
   };
-
   axios.post("https://trackapi.nutritionix.com/v2/natural/nutrients", {
-    "query": req.body.query,
+    "query": query,
     "timezone": "US/Eastern"
   }, config)
   .then(function (response) {
-    // console.log(response.data);
-    res.send(response.data);
+    // console.log("response", response.data);
+    let boolArr = [];
+      for (let i = 0; i < response.data.foods.length; i++) {
+        let foodies = response.data.foods[i];
+        console.log(foodies["nf_total_carbohydrate"], foodies["nf_dietary_fiber"], foodies["nf_total_fat"]);
+        if (kito(foodies["nf_total_carbohydrate"], foodies["nf_dietary_fiber"], foodies["nf_total_fat"])) {
+          // console.log(true);
+          boolArr.push(true);
+        } else {
+          // console.log(false);
+          boolArr.push(false);
+        }
+      }
+      cb(boolArr);
   })
   .catch(function (error) {
     console.log(error);
   });
+}
+
+function kito(carbs, fiber, totalCal) {
+  // console.log('kito', (carbs - fiber) / totalCal);
+  return ((carbs - fiber) / totalCal) < 0.1;
+}
+
+function openTableIteration(arr, cb) {
+
+  // Need to parse through foods from restaurants
+
+  for (let j = 0; j < arr.length; j++) {
+    cb(arr[j]);
+  }
+}
+
+// Mock restaurant data
+let mock = [
+  {
+    "restaurant":{
+      "name": "rest1",
+      "menu":[
+        "salad, burrito"
+      ]
+    }
+  },
+  {
+    "restaurant":{
+      "name": "rest2",
+      "menu":[
+        "eggs, cheese, ham"
+      ]
+    }
+  }
+];
+
+
+
+// Macro parser
+app.post('/nutri', (req, res) => {
+    let response = {
+      "restaurants": []
+    };
+    // openTableIteration(mock, (first) => {
+      nutritionix(first["restaurant"]["menu"][0], (arr) => {
+        // res.send(data);
+        // console.log(data);
+        if (arr.indexOf(true) > -1) {
+          response["restaurants"].push(first);
+
+        }
+      });
+    // });
 });
-
-// const chatHandler = require('./chat/handler.js').handler;
-// const nutri = require('./api/nutriParse.js');
-
-// module.exports.webhook = (event, context, callback) => {
-//   return chatHandler(event, context, callback);
-// };
-
-// module.exports.run = (event, context) => {
-//   const time = new Date();
-
-//   console.log('Cron job running!');
-
-// };
-
-// module.exports.nutriParser = (event, context, callback) => {
-//   nutri(event, context, callback);
-// };
-
 
 app.listen(PORT, () => {
   console.log(chalk.red(`Client on ${PORT}!`));
