@@ -1,5 +1,4 @@
 const axios = require('axios');
-const nutriParser = require('nutriParser.js');
 
 const restaurantId = 22151
 const payload = `{ restaurant(restaurantId: ${restaurantId}){ name menus{ title sections { items { description } } } } }`;
@@ -12,7 +11,7 @@ const nutriParser = (type, ingredients) => {
   return true;
 }
 
-const diet = 'paleo';
+const diet = 'keto';
 
 restaurantIds.filter(restaurantId => {
   let payload = `{ restaurant(restaurantId: ${restaurantId}){ name menus{ title sections { items { description } } } } }`;
@@ -26,7 +25,7 @@ restaurantIds.filter(restaurantId => {
   })
   .then(response => {
     response.data.data.restaurant.menus[0].sections.forEach(section => {
-      return section.items.all(item => {
+      return section.items.some(item => {
         return nutriParser(diet, item.description);
       })
     })

@@ -8,6 +8,7 @@ const chalk = require('chalk');
 
 const axios = require('axios');
 const API = require('./env/index.js');
+const Promise = require('bluebird')
 
 const app = express();
 const PORT = 8080;
@@ -18,30 +19,30 @@ const webpackHotMiddleware = require("webpack-hot-middleware");
 const config = require('../webpack.config.js');
 const compiler = webpack(config);
 
-app.use(webpackDevMiddleware(compiler, {
-  hot: true,
-  filename: 'bundle.js',
-  stats: {
-    chunks:false,
-    colors: true,
-  },
-  historyApiFallback: true
-}));
+// app.use(webpackDevMiddleware(compiler, {
+//   hot: true,
+//   filename: 'bundle.js',
+//   stats: {
+//     chunks:false,
+//     colors: true,
+//   },
+//   historyApiFallback: true
+// }));
 
-app.use(webpackHotMiddleware(compiler, {
-  log: console.log,
-  path: '/__webpack_hmr',
-  heartbeat: 10 * 1000,
-}));
+// app.use(webpackHotMiddleware(compiler, {
+//   log: console.log,
+//   path: '/__webpack_hmr',
+//   heartbeat: 10 * 1000,
+// }));
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.use(express.static('client'));
 
-app.get('/bundle.js', function(req, res) {
-  res.sendFile(path.resolve(__dirname, '../client/bundle.js'));
-});
+// app.get('/bundle.js', function(req, res) {
+//   res.sendFile(path.resolve(__dirname, '../client/bundle.js'));
+// });
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/index.html'));
@@ -76,8 +77,10 @@ app.post('/restaurants', (req, res) => {
 
 
 
+
 // Nutritionix API Call
-function nutritionix(query, cb) {
+// TODO: replace keto function with the diet
+function nutritionix(diet, query, cb) {
   let config = {
     headers: {
       'Content-Type': 'application/json',
@@ -93,9 +96,8 @@ function nutritionix(query, cb) {
     // console.log("response", response.data);
     let boolArr = [];
       for (let i = 0; i < response.data.foods.length; i++) {
-        let foodies = response.data.foods[i];
-        console.log(foodies["nf_total_carbohydrate"], foodies["nf_dietary_fiber"], foodies["nf_total_fat"]);
-        if (kito(foodies["nf_total_carbohydrate"], foodies["nf_dietary_fiber"], foodies["nf_total_fat"])) {
+        let foodies = response.data.foods[i];   
+        if (diet(foodies["nf_total_carbohydrate"], foodies["nf_dietary_fiber"], foodies["nf_total_fat"])) {
           // console.log(true);
           boolArr.push(true);
         } else {
@@ -110,57 +112,105 @@ function nutritionix(query, cb) {
   });
 }
 
-function kito(carbs, fiber, totalCal) {
-  // console.log('kito', (carbs - fiber) / totalCal);
+function keto(carbs, fiber, totalCal) {
+  // console.log('keto', (carbs - fiber) / totalCal);
   return ((carbs - fiber) / totalCal) < 0.1;
 }
 
-function openTableIteration(arr, cb) {
-
-  // Need to parse through foods from restaurants
-
-  for (let j = 0; j < arr.length; j++) {
-    cb(arr[j]);
-  }
-}
-
-// Mock restaurant data
-let mock = [
-  {
-    "restaurant":{
-      "name": "rest1",
-      "menu":[
-        "salad, burrito"
-      ]
-    }
-  },
-  {
-    "restaurant":{
-      "name": "rest2",
-      "menu":[
-        "eggs, cheese, ham"
-      ]
-    }
-  }
-];
-
-
-
 // Macro parser
 app.post('/nutri', (req, res) => {
-    let response = {
-      "restaurants": []
-    };
-    // openTableIteration(mock, (first) => {
-      nutritionix(first["restaurant"]["menu"][0], (arr) => {
-        // res.send(data);
-        // console.log(data);
-        if (arr.indexOf(true) > -1) {
-          response["restaurants"].push(first);
+  // start stub: //
+  let result = {
+    "restaurants": []
+  };
+  let diet = keto;
 
-        }
-      });
-    // });
+  const restaurants = [{
+    id: 334879,
+    name: 's'
+  },
+  {
+    id: 334882,
+    name: 's'
+  },
+  {
+    id: 334885,
+    name: 's'
+  },
+  {
+    id: 334888,
+    name: 's'
+  },
+  {
+    id: 334891,
+    name: 's'
+  },
+  {
+    id: 334894,
+    name: 's'
+  },
+  {
+    id: 334897,
+    name: 's'
+  },
+  {
+    id: 334900,
+    name: 's'
+  },
+  {
+    id: 334900,
+    name: 's'
+  }];
+
+  const checkStubRestaurants = (restaurants) => {
+    const rand = [];
+    for(let i = 0; i < restaurants.length; i++) {
+      const randomId = Math.floor(Math.random()*restaurants.length);
+      rand.push(randomId);
+    }
+    return restaurants.filter((restaurant, index) => {
+      return rand.includes(index);
+    });
+  };
+
+  res.send(checkStubRestaurants(restaurants));
+
+  // end stub //
+
+//   const checkRestaurant = (restaurant) => {
+//     return new Promise((resolve, reject) => {
+//       let restaurantId = restaurant.id;
+//       let payload = `{ restaurant(restaurantId: ${restaurantId}){ name menus{ title sections { items { description } } } } }`;
+//       axios({
+//         method:'post',
+//         baseURL: 'https://www.opentable.com',
+//         url: '/graphql',
+//         data: {
+//           query: payload   
+//         }
+//       }).then(response => {
+//         return response.data.data.restaurant.menus[1].sections.some(section => {
+//           return section.items.some(item => {
+//             if (item) {
+//               nutritionix(diet, item.description, (arr) => {
+//                 if (arr.includes(true)) {
+//                   resolve(restaurant);
+//                 } else {
+//                   resolve(false);
+//                 }
+//               });
+//             }
+//           });
+//         })
+//       }).catch(reject);
+//     });
+//   }
+
+//   Promise.all(restaurants.map(restaurant => checkRestaurant(restaurant)))
+//     .then(results => {
+//       res.send(results.filter(r => r !== false));
+//     });
+// });
 });
 
 app.listen(PORT, () => {
